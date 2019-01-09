@@ -11,3 +11,7 @@ class CommandType(Enum):
 class RowType(Enum):
     One=1
     Many=2
+
+class DBType(Enum):
+    MySQL=1
+    SQLServer=2

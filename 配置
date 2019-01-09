@@ -1,0 +1,22 @@
+#安装包下载不了，修改D:\Program Files\JetBrains\PyCharm 2017.3.4\helpers下的packaging_tool.py 文件
+
+def do_install(pkgs):
+    try:
+        try:
+            from pip._internal import main
+        except Exception:
+            from pip import main
+    except ImportError:
+        error_no_pip()
+    return main(['install'] + pkgs)
+
+
+def do_uninstall(pkgs):
+    try:
+        try:
+            from pip._internal import main
+        except Exception:
+            from pip import main
+    except ImportError:
+        error_no_pip()
+    return main(['uninstall', '-y'] + pkgs)

@@ -8,17 +8,20 @@ from Common.DB.DataAccess import DataAccess
 from Common.DB.EnumType import  CommandType
 from Common.DB.DBCommon import DBCommon
 
-def ExecuteScalar():
+def Test():
     da = DataAccess()
     cmdText = "SELECT now();"
-    res = da.ExecuteScalar(cmdText)
+    # res = da.ExecuteScalar(cmdText)
     res = da.ExecuteScalarByConn(cmdText)
     print(res)
     print(res['effect_row'])
     print(res['rows'][0])
+
+def ExecuteScalar():
+    da = DataAccess()
     cmdText="Truncate table Student;"
     res = da.ExecuteScalar(cmdText)
-    res = da.ExecuteScalarByConn(cmdText)
+    # res = da.ExecuteScalarByConn(cmdText)
     print(res)
 
 def ExecuteOneOrMany():
@@ -151,8 +154,7 @@ def ExecuteStoredProcdureTest(self):
 
 
 def main():
-
-
+    Test()
     # ExecuteScalar()
     # ExecuteOneOrMany()
     # ExecuteMany()
@@ -160,7 +162,7 @@ def main():
 
     # ExecuteNonQueryByParams()
     # ExecuteProc()
-    ExecuteProcConn()
+    # ExecuteProcConn()
 
 
 

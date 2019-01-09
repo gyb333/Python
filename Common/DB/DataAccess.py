@@ -1,11 +1,19 @@
 # -*- coding:utf-8 -*-
-import pymysql as ps
+# import pymysql as ps
+# import pymssql as  ps
 import contextlib
+import pandas as pd
 
 
 from Common.Config.DBConfig import DBConfig
 from Common.DB.EnumType import *
 from Common.DB.DBCommon import DBCommon
+dbType=DBType.MySQL
+
+if dbType == DBType.MySQL:
+    import pymysql as ps
+else:
+    import pymssql as  ps
 
 class DataAccess:
     def __init__(self,config=True):
@@ -19,6 +27,7 @@ class DataAccess:
         self.__conn=None
         self.__cursor=None
         self.__dictCursor=None
+
 
     def __del__(self):
         self.close()
@@ -80,6 +89,8 @@ class DataAccess:
         """
     def __Execute(self,cmdText, params=None,rowType=RowType.Many,commit=True,cursor=None):
         count=None
+        columns=None
+        columnHeads = []
         try:
             if not cursor:
                 cursor=self.Cursor
@@ -87,12 +98,17 @@ class DataAccess:
                 effect_row =cursor.execute(cmdText)
             else:
                 effect_row = cursor.execute(cmdText,params)
-
+            columns = cursor.description
             if rowType== RowType.Many:
                 rows = cursor.fetchall()
             else:
                 rows = cursor.fetchone()
-            return { 'effect_row': effect_row,'rows': rows}
+            dfrows= pd.DataFrame(list(rows))
+            for column in columns:
+                columnHeads.append(column[0])
+            if not dfrows.empty:
+                dfrows.columns=columnHeads
+            return { 'effect_row':effect_row,'rows': dfrows,'heads':columnHeads}
         except ps.Error as e:
             print(e)
         finally:
@@ -123,8 +139,6 @@ class DataAccess:
         finally:
             if commit:
                 self.Conn.commit()
-
-
 
 
     # 定义上下文管理器，连接后自动关闭连接
