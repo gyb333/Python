@@ -15,7 +15,7 @@ def Test():
     res = da.ExecuteScalarByConn(cmdText)
     print(res)
     print(res['effect_row'])
-    print(res['rows'][0])
+    print(res['rows'])
 
 def ExecuteScalar():
     da = DataAccess()

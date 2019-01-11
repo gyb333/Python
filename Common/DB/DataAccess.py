@@ -8,14 +8,19 @@ import pandas as pd
 from Common.Config.DBConfig import DBConfig
 from Common.DB.EnumType import *
 from Common.DB.DBCommon import DBCommon
-dbType=DBType.MySQL
 
-if dbType == DBType.MySQL:
+
+
+dbType =DBConfig.getDBType()
+if dbType == DBType.MYSQL:
     import pymysql as ps
-else:
+elif dbType == DBType.SQLSERVER:
     import pymssql as  ps
+else:
+    None
 
 class DataAccess:
+
     def __init__(self,config=True):
         if config:
             self.host=DBConfig.getDBHOST()
@@ -66,7 +71,13 @@ class DataAccess:
 
     def connect(self,host='localhost',port=3306,user='root',passwd='',database='test',charset='utf8'):
         try:
-            conn = ps.connect(host=host, user=user, passwd=passwd,db=database, port=port,charset=charset)
+            if dbType == DBType.MYSQL:
+                conn = ps.connect(host=host, user=user, passwd=passwd, db=database, port=port, charset=charset)
+            elif dbType == DBType.SQLSERVER:
+                conn = ps.connect(server=host, user=user, password=passwd, database=database, port=port, charset=charset)
+            else:
+                None
+
             return conn
         except :
            raise("DataBase connect error,please check the db config.")
@@ -108,6 +119,7 @@ class DataAccess:
                 columnHeads.append(column[0])
             if not dfrows.empty:
                 dfrows.columns=columnHeads
+            effect_row=cursor.rowcount
             return { 'effect_row':effect_row,'rows': dfrows,'heads':columnHeads}
         except ps.Error as e:
             print(e)

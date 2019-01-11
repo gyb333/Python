@@ -13,5 +13,5 @@ class RowType(Enum):
     Many=2
 
 class DBType(Enum):
-    MySQL=1
-    SQLServer=2
+    MYSQL=1
+    SQLSERVER=2

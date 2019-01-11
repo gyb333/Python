@@ -1,9 +1,10 @@
 from Common.Config.ConfigHelper import ConfigHelper
-
+from Common.DB.EnumType import DBType
 class DBConfig:
     __Section="DB"
     __ConfigFileName="DBConfig.ini"
     config = ConfigHelper(__ConfigFileName)
+    __DBType=DBType[config.getValue(__Section,"DB_TYPE").upper()]
     __DBName = config.getValue(__Section, "DB_NAME")
     __DBHOST = config.getValue(__Section, "DB_HOST")
     __DBPORT = int(config.getValue(__Section, "DB_PORT"))
@@ -13,6 +14,10 @@ class DBConfig:
     __LOGPATH = config.getValue(__Section, "LOG_PATH")
 
     __slots__ = ()  # 定义__slots__   限制对象实例不能添加属性
+
+    @classmethod
+    def getDBType(cls):
+        return cls.__DBType
 
     @classmethod
     def getDBName(cls):
