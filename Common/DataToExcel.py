@@ -70,8 +70,8 @@ def read_excel_with_openpyxl(excel_name="test.xlsx"):
     # print("Worksheet range(s):", wb.get_named_ranges())
     # print("Worksheet name(s):", wb.get_sheet_names())
     # 取第一张表
-    sheetnames = wb.get_sheet_names()
-    ws = wb.get_sheet_by_name(sheetnames[0])
+    sheetnames =  wb.sheetnames
+    ws = wb[sheetnames[0]]
     # 显示表名，表行数，表列数
     # 获取读入的excel表格的有多少行，有多少列
     row_num = ws.max_row

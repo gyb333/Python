@@ -8,3 +8,10 @@ def rm_path(p):
 def mk_Path(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+
+
+def get_desktop():
+    import winreg
+    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders')
+    return winreg.QueryValueEx(key, "Desktop")[0]

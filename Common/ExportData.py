@@ -1,34 +1,26 @@
-
-from Common.DB.DataAccess import DataAccess,dbType
+from Common.DB.DataAccess import DataAccess, dbType
 from Common.DB.EnumType import DBType
 from Common import DataToExcel
 from Common import FileUtil
 
 
-
-
-
-
-
-
-
 def getOrg(orgID=None):
     da = DataAccess()
-    if dbType==DBType.MYSQL:
+    if dbType == DBType.MYSQL:
         cmdText = '''SELECT o.OrgID,o.OrgCode,o.OrgName,o.ParentOrgID
                       FROM org o
                       where o.OrgType=%s'''
-    elif dbType==DBType.SQLSERVER:
-        cmdText='''SELECT o.OrgID,o.OrgCode,o.OrgName,o.ParentID
+    elif dbType == DBType.SQLSERVER:
+        cmdText = '''SELECT o.OrgID,o.OrgCode,o.OrgName,o.ParentID
                       FROM t_Org o
                       where o.OrgType=%s '''
     params = [3]
     if not orgID:
-        cmdText+= " AND o.OrgID=%s"
+        cmdText += " AND o.OrgID=%s"
         params.append(orgID)
         print(params)
     res = da.ExecuteNonQuery(cmdText, tuple(params))
-    return  res
+    return res
 
 
 def getCustomer(orgID):
@@ -78,8 +70,8 @@ def getCustomer(orgID):
       ) rDic ON cust.RegionId = rDic.Id
     WHERE ship.OrgID = %s AND ship.BussLineID = 100000042 AND cust.RegionId is NOT NULL;'''
         params = (orgID)
-    elif dbType==DBType.SQLSERVER:
-        cmdText='''SELECT *
+    elif dbType == DBType.SQLSERVER:
+        cmdText = '''SELECT *
     FROM (
     SELECT
     'KDS2' AS 来源系统
@@ -164,7 +156,7 @@ def getCustomer(orgID):
     ) temp
     ORDER BY temp.CustID ASC
     '''
-        params = (orgID,orgID,orgID)
+        params = (orgID, orgID, orgID)
     res = da.ExecuteNonQuery(cmdText, params)
     return res
 
@@ -172,7 +164,6 @@ def test():
     Orgs = getOrg()
     print(Orgs['effect_row'])
     df = Orgs["rows"]
-
     print(df._stat_axis.values.tolist())  # 行名称
     print(df.columns.values.tolist())  # 列名称
     # 根据索引遍历df
@@ -192,7 +183,7 @@ def export():
     Orgs = getOrg(1007)
     print(Orgs['effect_row'])
     df = Orgs["rows"]
-    basePath = "C:\\Users\\zhongduzhi\\Desktop\\分公司数据\\"
+    basePath =  FileUtil.get_desktop()+"\\分公司数据\\"
     if dbType == DBType.MYSQL:
         basePath += "KDS3"
     elif dbType == DBType.SQLSERVER:
@@ -203,15 +194,16 @@ def export():
         orgName = getattr(row, 'OrgName')
         data = getCustomer(orgID)
         filePath = basePath + "\\" + orgName + ".xlsx"
-        DataToExcel.write_to_excel_with_openpyxl(data["rows"], data["heads"], filepath=filePath,pageSize=10000)
+        DataToExcel.write_to_excel_with_openpyxl(data["rows"], data["heads"], filepath=filePath, pageSize=10000)
+
 
 def main():
-
     # export()
-    basePath = "C:\\Users\\zhongduzhi\\Desktop\\分公司数据\\"
-    data= DataToExcel.read_excel_with_openpyxl(basePath+"test.xlsx")
+    basePath = FileUtil.get_desktop()+"\\分公司数据\\"
+    data = DataToExcel.read_excel_with_openpyxl(basePath + "test.xlsx")
     # data=DataToExcel.read_excel(basePath+"test.xls")
     print(data.columns)
+    print(basePath)
 
 if __name__ == '__main__':
     main()
