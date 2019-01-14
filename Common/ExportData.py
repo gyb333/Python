@@ -222,13 +222,13 @@ def export():
 
 
 def main():
-    export()
-    # basePath = FileUtil.get_desktop()+"\\分公司数据\\"
+    # export()
+    basePath = FileUtil.get_desktop()+"\\分公司数据\\"
     # data = DataToExcel.read_excel_with_openpyxl(basePath + "KDS2\\南昌分公司.xlsx")
-    # # data=DataToExcel.read_excel(basePath+"test.xls")
-    # print(data)
-    # print(data.columns)
-    # print(basePath)
+    data=DataToExcel.read_excel(basePath+"test.xls")
+    print(data)
+    print(data.columns)
+    print(basePath)
 
 
 if __name__ == '__main__':

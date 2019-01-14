@@ -20,9 +20,11 @@ def getOrg(orgID=None):
     return res
 
 def main():
-    Orgs = getOrg()
-    print(Orgs)
     print("dfasdfsa")
+    import stackless as sl
+    sl.tasklet(print)("fgsdfgds")
+    sl.run()
+    getOrg()
 
 if __name__ == '__main__':
     main()

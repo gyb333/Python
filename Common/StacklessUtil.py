@@ -75,8 +75,9 @@ def testChannel():
 
 def main():
     testTasklet()
-    # # testScheduler()
-    # testChannel()
+    testScheduler()
+    testChannel()
+    print("test")
 
 if __name__ == '__main__':
     main()
