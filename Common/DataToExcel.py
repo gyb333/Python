@@ -53,13 +53,13 @@ def write_to_excel_with_openpyxl(df, columnHeaders, filepath="save.xlsx",pageSiz
             # ws.cell(i, j, row[j - 1])
             ws.cell(row=i,column=j).value=str(row[j-1]).encode("utf-8",errors="ignore")
         if i % pageSize == 0:
-            ew.save()
+            ew.save(filepath)
             archive = ZipFile(filepath, 'w', ZIP_DEFLATED)
             ew = ExcelWriter(workbook=wb, archive=archive)
         i += 1
     if i%pageSize!=0:
         # 写文件
-        ew.save()
+        ew.save(filepath)
     print("导出成功:"+filepath)
 
 

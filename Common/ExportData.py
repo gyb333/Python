@@ -15,7 +15,7 @@ def getOrg(orgID=None):
                       FROM t_Org o
                       where o.OrgType=%s '''
     params = [3]
-    if not orgID:
+    if not orgID is None:
         cmdText += " AND o.OrgID=%s"
         params.append(orgID)
         print(params)
@@ -27,48 +27,49 @@ def getCustomer(orgID):
     da = DataAccess()
     if dbType == DBType.MYSQL:
         cmdText = '''SELECT 'kds3' AS 来源系统, cb.CompBranchCodeSAP AS 户头SAP代码, cb.CompBranchName AS 户头名称,
-      f.Code AS 客户编码,f.Name AS 客户名称,
-      REPLACE(SUBSTR(cust.StandardCustAttribute, INSTR(cust.StandardCustAttribute, '"CustChannelTypeName":') + 22,
-      INSTR(cust.StandardCustAttribute, '"CustChannel":') - INSTR(cust.StandardCustAttribute, '"CustChannelTypeName":') - 23), '"', '') AS 渠道类型,
-      REPLACE(SUBSTR(cust.StandardCustAttribute,
-      INSTR(cust.StandardCustAttribute, '"CustChannelName":') + 18,
-      INSTR(cust.StandardCustAttribute, '"CustArea":') - INSTR(cust.StandardCustAttribute, '"CustChannelName":') - 19), '"', '') AS 客户类型,
-      rDic.省, rDic.市, rDic.`县/区`, rDic.`镇/街道`, rDic.村,
-      p.Name AS 联系人, p.Mobile AS 联系电话
-      FROM companycustomers cust
-      INNER JOIN firms f ON cust.Id = f.Id
-      INNER JOIN companybranch cb ON cust.CompanyBranchCompBranchID = cb.CompBranchID
-      INNER JOIN distributor d on cb.DistributorID = d.DistributorID
-      INNER JOIN orgdistributorcontractrelationship ship ON d.DistributorContractID = ship.DistributorContractID and ship.IsValid = 1
-      LEFT JOIN firmcontacts fc on f.Id = fc.FirmId
-      LEFT JOIN persons p on p.Id = fc.Id
-      LEFT JOIN
-      (
-    SELECT r.Id, r.Name AS 省, '' AS 市, '' AS '县/区',  '' AS  '镇/街道', '' AS 村 FROM regions r where r.Level = 1 and r.IsValid = 1
-      UNION ALL
-      SELECT r.Id, r1.Name AS 省, r.Name AS 市, '' AS '县/区',  '' AS  '镇/街道', '' AS 村 from regions r
-        LEFT JOIN regions r1 ON r.RegionId = r1.Id AND r1.IsValid = 1 AND r1.Level = 1
-      WHERE r.Level = 2 AND r.IsValid = 1
-        union all
-     SELECT r.Id, r2.Name AS 省, r1.Name AS 市, r.Name AS '县/区',  '' AS  '镇/街道', '' AS 村 FROM regions r
-        LEFT JOIN regions r1 ON r.RegionId = r1.Id AND r1.IsValid = 1  AND r1.Level = 2
-        LEFT JOIN regions r2 ON r1.RegionId = r2.Id AND r2.IsValid = 1  AND r2.Level = 1
-      WHERE r.Level = 3 AND r.IsValid = 1
-       union all
-     SELECT r.Id, r3.Name AS 省, r2.Name AS 市, r1.Name AS '县/区',  r.Name AS  '镇/街道', '' AS 村 FROM regions r
-        LEFT JOIN regions r1 ON r.RegionId = r1.Id AND r1.IsValid = 1 AND r1.Level = 3
-        LEFT JOIN regions r2 ON r1.RegionId = r2.Id AND r2.IsValid = 1 and r2.Level = 2
-      LEFT JOIN regions r3 ON r2.RegionId = r3.Id AND r3.IsValid = 1 AND r3.Level = 1
-      WHERE r.Level = 4 AND r.IsValid = 1
-       union all
-     SELECT r.Id, r4.Name AS 省, r3.Name AS 市, r2.Name AS '县/区',  r1.Name AS  '镇/街道', r.Name AS 村 FROM regions r
-        LEFT JOIN regions r1 ON r.RegionId = r1.Id AND r1.IsValid = 1 AND r1.Level = 4
-        LEFT JOIN regions r2 ON r1.RegionId = r2.Id AND r2.IsValid = 1 AND r2.Level = 3
-      LEFT JOIN regions r3 ON r2.RegionId = r3.Id AND r3.IsValid = 1 AND r3.Level = 2
-      LEFT JOIN regions r4 ON r3.RegionId = r4.Id AND r4.IsValid = 1 AND r4.Level = 1
-      WHERE r.Level = 5 AND r.IsValid = 1
-      ) rDic ON cust.RegionId = rDic.Id
-    WHERE ship.OrgID = %s AND ship.BussLineID = 100000042 AND cust.RegionId is NOT NULL;'''
+  f.Id AS 客户ID,f.Code AS 客户编码,f.Name AS 客户名称,     
+  REPLACE(SUBSTR(cust.StandardCustAttribute, INSTR(cust.StandardCustAttribute, '"CustChannelTypeName":') + 22, 
+  INSTR(cust.StandardCustAttribute, '"CustChannel":') - INSTR(cust.StandardCustAttribute, '"CustChannelTypeName":') - 23), '"', '') AS 渠道类型, 
+  REPLACE(SUBSTR(cust.StandardCustAttribute, 
+  INSTR(cust.StandardCustAttribute, '"CustChannelName":') + 18, 
+  INSTR(cust.StandardCustAttribute, '"CustArea":') - INSTR(cust.StandardCustAttribute, '"CustChannelName":') - 19), '"', '') AS 客户类型,
+  rDic.省, rDic.市, rDic.`县/区`, rDic.`镇/街道`, rDic.村,
+  cust.Address AS 客户地址,
+  p.Name AS 联系人, p.Mobile AS 联系电话
+  FROM companycustomers cust
+  INNER JOIN firms f ON cust.Id = f.Id
+  INNER JOIN companybranch cb ON cust.CompanyBranchCompBranchID = cb.CompBranchID
+  INNER JOIN distributor d on cb.DistributorID = d.DistributorID
+  INNER JOIN orgdistributorcontractrelationship ship ON d.DistributorContractID = ship.DistributorContractID and ship.IsValid = 1
+  LEFT JOIN firmcontacts fc on f.Id = fc.FirmId
+  LEFT JOIN persons p on p.Id = fc.Id
+  LEFT JOIN 
+  (
+SELECT r.Id, r.Name AS 省, '' AS 市, '' AS '县/区',  '' AS  '镇/街道', '' AS 村 FROM regions r where r.Level = 1 and r.IsValid = 1
+  UNION ALL 
+  SELECT r.Id, r1.Name AS 省, r.Name AS 市, '' AS '县/区',  '' AS  '镇/街道', '' AS 村 from regions r 
+    LEFT JOIN regions r1 ON r.RegionId = r1.Id AND r1.IsValid = 1 AND r1.Level = 1
+  WHERE r.Level = 2 AND r.IsValid = 1
+    union all
+ SELECT r.Id, r2.Name AS 省, r1.Name AS 市, r.Name AS '县/区',  '' AS  '镇/街道', '' AS 村 FROM regions r
+    LEFT JOIN regions r1 ON r.RegionId = r1.Id AND r1.IsValid = 1  AND r1.Level = 2
+    LEFT JOIN regions r2 ON r1.RegionId = r2.Id AND r2.IsValid = 1  AND r2.Level = 1
+  WHERE r.Level = 3 AND r.IsValid = 1
+   union all
+ SELECT r.Id, r3.Name AS 省, r2.Name AS 市, r1.Name AS '县/区',  r.Name AS  '镇/街道', '' AS 村 FROM regions r
+    LEFT JOIN regions r1 ON r.RegionId = r1.Id AND r1.IsValid = 1 AND r1.Level = 3
+    LEFT JOIN regions r2 ON r1.RegionId = r2.Id AND r2.IsValid = 1 and r2.Level = 2
+  LEFT JOIN regions r3 ON r2.RegionId = r3.Id AND r3.IsValid = 1 AND r3.Level = 1
+  WHERE r.Level = 4 AND r.IsValid = 1
+   union all
+ SELECT r.Id, r4.Name AS 省, r3.Name AS 市, r2.Name AS '县/区',  r1.Name AS  '镇/街道', r.Name AS 村 FROM regions r
+    LEFT JOIN regions r1 ON r.RegionId = r1.Id AND r1.IsValid = 1 AND r1.Level = 4
+    LEFT JOIN regions r2 ON r1.RegionId = r2.Id AND r2.IsValid = 1 AND r2.Level = 3
+  LEFT JOIN regions r3 ON r2.RegionId = r3.Id AND r3.IsValid = 1 AND r3.Level = 2
+  LEFT JOIN regions r4 ON r3.RegionId = r4.Id AND r4.IsValid = 1 AND r4.Level = 1
+  WHERE r.Level = 5 AND r.IsValid = 1
+  ) rDic ON cust.RegionId = rDic.Id
+    WHERE ship.OrgID = %s AND ship.IsValid=1 AND ship.BussLineID = 100000042 AND cust.RegionId is NOT NULL;'''
         params = (orgID)
     elif dbType == DBType.SQLSERVER:
         cmdText = '''SELECT *
@@ -97,7 +98,7 @@ def getCustomer(orgID):
     INNER JOIN dbo.t_Distributor td ON cb.DistributorID=td.DistributorID
     INNER JOIN dbo.t_DistributorContract tdc ON td.DistributorContractID=tdc.DistributorContractID
     INNER JOIN dbo.t_Org org ON tdc.OrgBranchID=org.OrgID
-    WHERE org.OrgID=%s
+    WHERE org.OrgID=%s AND tcb.Disabled=0 
     UNION
     SELECT
     'KDS2' AS 来源系统
@@ -124,7 +125,7 @@ def getCustomer(orgID):
     INNER JOIN dbo.t_Distributor td ON cb.DistributorID=td.DistributorID
     INNER JOIN dbo.t_DistributorContract tdc ON td.DistributorContractID=tdc.DistributorContractID
     INNER JOIN dbo.t_Org org ON tdc.OrgBranchID=org.OrgID
-    WHERE org.OrgID=%s
+    WHERE org.OrgID=%s AND tcb.Disabled=0 
     UNION
     SELECT
     'KDS2' AS 来源系统
@@ -152,13 +153,14 @@ def getCustomer(orgID):
     INNER JOIN dbo.t_Distributor td ON cb.DistributorID=td.DistributorID
     INNER JOIN dbo.t_DistributorContract tdc ON td.DistributorContractID=tdc.DistributorContractID
     INNER JOIN dbo.t_Org org ON tdc.OrgBranchID=org.OrgID
-    WHERE org.OrgID=%s
+    WHERE org.OrgID=%s AND tcb.Disabled=0 
     ) temp
     ORDER BY temp.CustID ASC
     '''
         params = (orgID, orgID, orgID)
     res = da.ExecuteNonQuery(cmdText, params)
     return res
+
 
 def test():
     Orgs = getOrg()
@@ -179,31 +181,51 @@ def test():
         print(getattr(row, 'OrgID'), getattr(row, 'OrgName'))
 
 
+
+from threading import Thread
+def async(func):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target = func, args = args, kwargs = kwargs)
+        thr.start()
+    return wrapper
+
+@async
+def exec(orgID,filePath):
+    data = getCustomer(orgID)
+    DataToExcel.write_to_excel_with_openpyxl(data["rows"], data["heads"], filepath=filePath, pageSize=10000)
+
+
+def tasklet(row,basePath):
+    orgID = getattr(row, 'OrgID')
+    orgName = getattr(row, 'OrgName')
+    filePath = basePath + "\\" + orgName + ".xlsx"
+    exec(orgID, filePath)
+
 def export():
-    Orgs = getOrg(1007)
+    Orgs = getOrg()
     print(Orgs['effect_row'])
     df = Orgs["rows"]
-    basePath =  FileUtil.get_desktop()+"\\分公司数据\\"
+    basePath = FileUtil.get_desktop() + "\\分公司数据\\"
     if dbType == DBType.MYSQL:
         basePath += "KDS3"
     elif dbType == DBType.SQLSERVER:
         basePath += "KDS2"
     FileUtil.mk_Path(basePath)
+    import stackless as sl
     for row in df.itertuples(index=True, name='Pandas'):
-        orgID = getattr(row, 'OrgID')
-        orgName = getattr(row, 'OrgName')
-        data = getCustomer(orgID)
-        filePath = basePath + "\\" + orgName + ".xlsx"
-        DataToExcel.write_to_excel_with_openpyxl(data["rows"], data["heads"], filepath=filePath, pageSize=10000)
+        sl.tasklet(tasklet)(row,basePath)
+    sl.run()
+
 
 
 def main():
-    # export()
-    basePath = FileUtil.get_desktop()+"\\分公司数据\\"
-    data = DataToExcel.read_excel_with_openpyxl(basePath + "test.xlsx")
-    # data=DataToExcel.read_excel(basePath+"test.xls")
-    print(data.columns)
-    print(basePath)
+    export()
+    # basePath = FileUtil.get_desktop()+"\\分公司数据\\"
+    # data = DataToExcel.read_excel_with_openpyxl(basePath + "test.xlsx")
+    # # data=DataToExcel.read_excel(basePath+"test.xls")
+    # print(data.columns)
+    # print(basePath)
+
 
 if __name__ == '__main__':
     main()

@@ -119,7 +119,9 @@ class DataAccess:
                 columnHeads.append(column[0])
             if not dfrows.empty:
                 dfrows.columns=columnHeads
+
             effect_row=cursor.rowcount
+
             return { 'effect_row':effect_row,'rows': dfrows,'heads':columnHeads}
         except ps.Error as e:
             print(e)
