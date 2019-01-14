@@ -51,7 +51,10 @@ def write_to_excel_with_openpyxl(df, columnHeaders, filepath="save.xlsx",pageSiz
     for index, row in df.iterrows():
         for j in range(1, length + 1):
             # ws.cell(i, j, row[j - 1])
-            ws.cell(row=i,column=j).value=str(row[j-1]).encode("utf-8",errors="ignore")
+            try:
+                ws.cell(row=i,column=j).value=str(row[j-1]).encode("utf-8",errors="ignore")
+            except Exception as e:
+                print(e)
         if i % pageSize == 0:
             ew.save(filepath)
             archive = ZipFile(filepath, 'w', ZIP_DEFLATED)
@@ -64,38 +67,42 @@ def write_to_excel_with_openpyxl(df, columnHeaders, filepath="save.xlsx",pageSiz
 
 
 def read_excel_with_openpyxl(excel_name="test.xlsx"):
-    # 读取excel2007文件
-    wb = load_workbook(filename=excel_name)
-    # 显示有多少张表
-    # print("Worksheet range(s):", wb.get_named_ranges())
-    # print("Worksheet name(s):", wb.get_sheet_names())
-    # 取第一张表
-    sheetnames =  wb.sheetnames
-    ws = wb[sheetnames[0]]
-    # 显示表名，表行数，表列数
-    # 获取读入的excel表格的有多少行，有多少列
-    row_num = ws.max_row
-    col_num = ws.max_column
-    print("Title:", ws.title, "row_num: ", row_num, " col_num: ", col_num)
-    print("--------------------------------")
-    # 建立存储数据的字典
-    data_dic = {}
-    head=[]
-    sign = 1
-    # 把数据存到字典中
-    for row in ws.rows:
-        temp_list = []
-        # print("row:", row)
-        for cell in row:
-            temp_list.append(cell.value)
-        if sign==1:
-            head=temp_list
-        else:
-            data_dic[sign] = temp_list
-        sign += 1
-    import pandas as pd
-    df= pd.DataFrame.from_dict(data_dic, orient='index', columns=head)
-    return df
+    try:
+        # 读取excel2007文件
+        wb = load_workbook(filename=excel_name)
+        # 显示有多少张表
+        # print("Worksheet range(s):", wb.get_named_ranges())
+        # print("Worksheet name(s):", wb.get_sheet_names())
+        # 取第一张表
+        sheetnames =  wb.sheetnames
+        ws = wb[sheetnames[0]]
+        # 显示表名，表行数，表列数
+        # 获取读入的excel表格的有多少行，有多少列
+        row_num = ws.max_row
+        col_num = ws.max_column
+        print("Title:", ws.title, "row_num: ", row_num, " col_num: ", col_num)
+        print("--------------------------------")
+        # 建立存储数据的字典
+        data_dic = {}
+        head=[]
+        sign = 1
+        # 把数据存到字典中
+        for row in ws.rows:
+            temp_list = []
+            # print("row:", row)
+            for cell in row:
+                temp_list.append(cell.value)
+            if sign==1:
+                head=temp_list
+            else:
+                data_dic[sign] = temp_list
+            sign += 1
+        import pandas as pd
+        df= pd.DataFrame.from_dict(data_dic, orient='index', columns=head)
+        return df
+    except:
+        pass
+
 
 
 def read_excel(excel_name):
